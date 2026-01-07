@@ -1,6 +1,6 @@
 import logging
 from telegram import Update
-from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
+from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, Application
 
 TOKEN = '7917687353:AAF1Al7xIvEg8v8iMWE-vxrnCzCriY-4qGs'
 
@@ -12,7 +12,6 @@ scripts = {
 
 **Soluna Hub** — лучший тролл:
 loadstring(game:HttpGet("https://raw.githubusercontent.com/Patheticcs/Soluna-API/refs/heads/main/brookhaven.lua",true))()
-
 
 **Infinite Yield** — админ команды:
 loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
@@ -44,7 +43,6 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/RedZHub/RedZHub/main/
 
 **Owl Hub**:
 loadstring(game:HttpGet("https://raw.githubusercontent.com/CriShoux/OwlHub/master/OwlHub.txt"))()
-loadstring(game:HttpGet("https://raw.githubusercontent.com/Aidez/client/main/arsenal.lua"))()
     """,
 
     'petsimulator': """
@@ -63,7 +61,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "/script brookhaven\n"
         "/script fishit\n"
         "/script bloxfruits\n\n"
-        "Скрипты свежие 2026 года!"
+        "Скрипты свежие 2026 года!",
+        parse_mode='Markdown'
     )
 
 async def get_script(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -78,8 +77,15 @@ async def get_script(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(f"Скрипта для {game} пока нет. Напиши название — добавлю!")
 
 if __name__ == '__main__':
+    # Создаём приложение
     app = ApplicationBuilder().token(TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("script", get_script))
-    print("🤖 Бот запущен!")
-    app.run_polling()
+    print("🤖 Бот запущен на webhook!")
+    app.run_webhook(
+        listen="0.0.0.0",
+        port=int(os.environ.get("PORT", 8443)),
+        url_path=TOKEN,
+        webhook_url=f"https://script-roblox-bot.onrender.com/{TOKEN}"
+    )
+    
